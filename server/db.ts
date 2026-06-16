@@ -3,7 +3,10 @@ import path from 'path';
 import { LifestyleAssessment, EmissionBreakdown, Hotspot, GreenPersona, RoadmapWeek, Challenge, TrackedHistory, CoachMessage, FullProfile } from '../src/types';
 import { calculateEmissions, calculateEcoScore } from '../src/utils/calculator';
 
-const DB_FILE = path.join(process.cwd(), 'database.json');
+const isVercel = process.env.VERCEL || process.env.NOW_REGION;
+const DB_FILE = isVercel
+  ? path.join('/tmp', 'database.json')
+  : path.join(process.cwd(), 'database.json');
 
 interface Schema {
   profile: {
