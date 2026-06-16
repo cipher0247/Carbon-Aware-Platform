@@ -1,6 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
-import { createServer as createViteServer } from 'vite';
 import { db } from './server/db';
 import { generateEcoProfile, interactWithCoach } from './server/gemini';
 import { LifestyleAssessment } from './src/types';
@@ -324,6 +323,7 @@ app.post('/api/reset', (req: Request, res: Response) => {
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     console.log('Launching in Developer mode with active Vite middlewares...');
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
