@@ -102,6 +102,7 @@ const SECOND_DEFAULT_HISTORY: TrackedHistory[] = [
 
 class Database {
   private schema: Schema;
+  private isLoaded = false;
 
   constructor() {
     this.schema = {
@@ -116,6 +117,11 @@ class Database {
       challenges: [],
       messages: [],
     };
+  }
+
+  private ensureLoaded() {
+    if (this.isLoaded) return;
+    this.isLoaded = true;
     this.load();
   }
 
@@ -125,8 +131,16 @@ class Database {
         const content = fs.readFileSync(DB_FILE, 'utf8');
         this.schema = JSON.parse(content);
       } else {
-        // Run seed
-        this.seed();
+        // Under Vercel, copy raw starting template database to writable /tmp if present
+        const backupFile = path.join(process.cwd(), 'database.json');
+        if (isVercel && fs.existsSync(backupFile)) {
+          console.log('Copying read-only packaged database to writeable /tmp partition...');
+          const content = fs.readFileSync(backupFile, 'utf8');
+          fs.writeFileSync(DB_FILE, content, 'utf8');
+          this.schema = JSON.parse(content);
+        } else {
+          this.seed();
+        }
       }
     } catch (err) {
       console.warn('Failed to load database. Re-seeding as precaution...', err);
@@ -178,6 +192,7 @@ class Database {
 
   // API operations
   getProfile(): FullProfile {
+    this.ensureLoaded();
     // If not calculated yet, seed
     if (!this.schema.profile.assessment) {
       this.seed();
@@ -195,6 +210,7 @@ class Database {
   }
 
   updateAssessment(assessment: LifestyleAssessment, generatedPersona?: GreenPersona, generatedRoadmap?: RoadmapWeek[]): FullProfile {
+    this.ensureLoaded();
     const breakdown = calculateEmissions(assessment);
     const ecoScore = calculateEcoScore(breakdown.total);
 
@@ -232,6 +248,7 @@ class Database {
 
   // Toggle tasks
   toggleRoadmapTask(weekNum: number, taskId: string): RoadmapWeek[] {
+    this.ensureLoaded();
     const week = this.schema.roadmap.find(w => w.week === weekNum);
     if (week) {
       const task = week.tasks.find(t => t.id === taskId);
@@ -245,6 +262,7 @@ class Database {
 
   // Toggle challenges
   toggleChallenge(challengeId: string): Challenge[] {
+    this.ensureLoaded();
     const challenge = this.schema.challenges.find(c => c.id === challengeId);
     if (challenge) {
       challenge.completed = !challenge.completed;
@@ -255,6 +273,7 @@ class Database {
 
   // Add customized challenge
   addChallenge(challenge: Challenge) {
+    this.ensureLoaded();
     this.schema.challenges.push(challenge);
     this.save();
     return this.schema.challenges;
@@ -262,17 +281,20 @@ class Database {
 
   // Reset/seed helper for testing or clean start
   resetDB() {
+    this.ensureLoaded();
     this.seed();
     return this.getProfile();
   }
 
   // Get messages
   getMessages(): CoachMessage[] {
+    this.ensureLoaded();
     return this.schema.messages;
   }
 
   // Add message
   addMessage(msg: Omit<CoachMessage, 'id' | 'timestamp'>): CoachMessage {
+    this.ensureLoaded();
     const newMsg: CoachMessage = {
       ...msg,
       id: 'msg-' + Date.now(),
