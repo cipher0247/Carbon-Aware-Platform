@@ -131,10 +131,23 @@ class Database {
         const content = fs.readFileSync(DB_FILE, 'utf8');
         this.schema = JSON.parse(content);
       } else {
-        // Under Vercel, copy raw starting template database to writable /tmp if present
-        const backupFile = path.join(process.cwd(), 'database.json');
-        if (isVercel && fs.existsSync(backupFile)) {
-          console.log('Copying read-only packaged database to writeable /tmp partition...');
+        // Find backup starter database template with fallbacks
+        let backupFile = '';
+        const pathsToTry = [
+          path.join(process.cwd(), 'database.json'),
+          path.join(__dirname, 'database.json'),
+          path.join(__dirname, '..', 'database.json'),
+          path.join(__dirname, '../..', 'database.json'),
+        ];
+        for (const p of pathsToTry) {
+          if (fs.existsSync(p)) {
+            backupFile = p;
+            break;
+          }
+        }
+
+        if (isVercel && backupFile) {
+          console.log(`Copying read-only packaged database from ${backupFile} to writeable /tmp partition...`);
           const content = fs.readFileSync(backupFile, 'utf8');
           fs.writeFileSync(DB_FILE, content, 'utf8');
           this.schema = JSON.parse(content);
