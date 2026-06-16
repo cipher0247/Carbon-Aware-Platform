@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-natural-bg: #F9F9F4;
+  --color-natural-text: #2D2D2A;
+  --color-natural-moss: #5A5A40;
+  --color-natural-moss-dark: #373724;
+  --color-natural-sage: #CCD5AE;
+  --color-natural-cream: #E9EDC9;
+  --color-natural-khaki: #FEFAE0;
+  --color-natural-earth: #D4A373;
+  --color-natural-earth-dark: #8C4E1D;
+  --color-natural-border: #E0E0D6;
+  --color-natural-muted: #8A8A7A;
+  --color-natural-muted-dark: #5C5C50;
+}
+
+body {
+  background-color: #F9F9F4;
+  color: #2D2D2A;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Rounded [32px] design containers matching mockups */
+.natural-card {
+  background-color: #ffffff;
+  border-radius: 32px;
+  border: 1px solid #E0E0D6;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.natural-card-dark {
+  background-color: #5A5A40;
+  color: #ffffff;
+  border-radius: 32px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.natural-card-warm {
+  background-color: #FEFAE0;
+  border-radius: 32px;
+  border: 1px solid #E9EDC9;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}

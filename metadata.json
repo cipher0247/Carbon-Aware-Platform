@@ -1,0 +1,6 @@
+{
+  "name": "Carbon Footprint Awareness Platform",
+  "description": "An AI-powered sustainability coach that calculates, tracks, and reduces your carbon footprint through personalized plans, what-if simulations, and weekly challenges with Gemini AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
